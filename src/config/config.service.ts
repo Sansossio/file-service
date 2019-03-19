@@ -1,65 +1,63 @@
-import * as Joi from 'joi';
 import * as _ from 'lodash';
+import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as defaultConfig from './configs/default';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
+export interface IConfig {
+  [key: string]: any;
+}
+dotenv.config();
 
 export interface EnvConfig {
   [key: string]: string;
 }
 
+@Injectable()
 export class ConfigService {
-  private readonly envConfig: { [key: string]: any };
-
-  constructor(filename: string) {
-    this.envConfig = this.validateInput(Object.assign({}, require(`../../config/${filename}.json`), process.env));
+  private config: IConfig = defaultConfig.default;
+  constructor() {
+    this.loadEnv();
+    this.loadConfiguration();
   }
-
-  get<T>(key: string): T {
-    return _.get(this.envConfig, key);
+  private set(key: string, value: any) {
+    _.set(this.config, key, value);
   }
-
-  private validateInput(envConfig: EnvConfig): EnvConfig {
-    const envVarsSchema: Joi.ObjectSchema = Joi.object({
-      NODE_ENV: Joi.string()
-        .valid(['development', 'production', 'staging'])
-        .default('development'),
-      PORT: Joi.number().default(3000),
-
-      // DB  SETTINGS
-      DB_USER: Joi.string().required(),
-      DB_PASSWORD: Joi.string()
-        .allow('')
-        .required(),
-      DB_HOST: Joi.string().required(),
-      DB_NAME: Joi.string().required(),
-    });
-
-    const { error, value: validatedEnvConfig } = Joi.validate(envConfig, envVarsSchema, {
-      allowUnknown: true,
-    });
-    if (error) {
-      throw new Error(`Config validation error: ${error.message}`);
+  private loadEnv() {
+    const { env } = process;
+    for (const key in env) {
+      const value = env[key];
+      if (key.indexOf('npm_') !== 0) {
+        this.set(key, value);
+      }
     }
-    return validatedEnvConfig;
   }
-
-  get nodeEnv(): string {
-    return this.envConfig.NODE_ENV;
+  private loadConfiguration() {
+    const { NODE_ENV } = process.env;
+    if (!NODE_ENV) return;
+    const path: string = `${__dirname}/configs/${NODE_ENV}`;
+    const availableExt: string[] = ['ts', 'js', 'json'];
+    let foundExt: boolean = false;
+    for (const ext of availableExt) {
+      const fullPath: string = `${path}.${ext}`;
+      if (fs.existsSync(fullPath)) {
+        const configEnv = require(fullPath).default;
+        this.config = _.merge(this.config, configEnv);
+        foundExt = true;
+        break;
+      }
+    }
+    if (!foundExt) {
+      console.error(`No config found for environment: ${NODE_ENV}`);
+      return;
+    }
+    console.log(`Loaded configuration to env: ${NODE_ENV}`);
   }
-
-  get port(): number {
-    return parseInt(this.envConfig.PORT, 10);
+  get<T>(key: string): T {
+    return _.get(this.config, key);
   }
   createTypeOrmOptions(): TypeOrmModuleOptions {
-    return {
-      type: 'postgres',
-      host: this.envConfig.DB_HOST,
-      port: 5432,
-      username: this.envConfig.DB_USER,
-      password: this.envConfig.DB_PASSWORD,
-      database: this.envConfig.DB_NAME,
-      entities: [this.nodeEnv === 'production' ? 'dist/**/**.entity.js' : 'src/**/**.entity{.ts,.js}'],
-      synchronize: true,
-      logging: false,
-    };
+    const response = this.get<TypeOrmModuleOptions>('database.postgres');
+    return response;
   }
 }
