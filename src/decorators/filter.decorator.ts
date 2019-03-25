@@ -1,4 +1,4 @@
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, BadRequestException } from '@nestjs/common';
 import * as _ from 'lodash';
 import { Raw } from 'typeorm';
 
@@ -33,7 +33,7 @@ const queryPipe = (filter: any, requiredWhere) => {
     }
     return query.filter;
   } catch (err) {
-    return { where: requiredWhere };
+    throw new BadRequestException(err.message);
   }
 };
 
