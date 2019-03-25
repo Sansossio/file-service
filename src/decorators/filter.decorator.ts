@@ -17,14 +17,20 @@ export const Filter = createParamDecorator((data, req) => {
       requiredWhere[option] = _.get(req, target);
     }
   }
-  const filter = queryPipe(_.get(req, 'query.filter'), requiredWhere);
+  let receiveFilter: any = _.get(req, 'query.filter');
+  if (!receiveFilter) {
+    receiveFilter = {};
+  }
+  const filter = queryPipe(receiveFilter, requiredWhere);
   return filter;
 });
 
 const queryPipe = (filter: any, requiredWhere) => {
   const query = { filter };
   try {
-    query.filter = JSON.parse(query.filter);
+    if (typeof query.filter === 'string') {
+      query.filter = JSON.parse(query.filter);
+    }
     query.filter.where = query.filter.where || {};
     if (query.filter.where instanceof Array) {
       query.filter.where = query.filter.where.map(where => Object.assign(parseQuery(where), requiredWhere));
