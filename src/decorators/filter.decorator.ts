@@ -50,28 +50,25 @@ const parseQuery = where => {
     if (typeof query === 'object') {
       if (query.type) query.type = `::${query.type}`;
       if (query.method) query.method = query.method.toLowerCase();
+      conector = query.method.toUpperCase();
       switch (query.method) {
         case 'between':
-          conector = 'BETWEEN';
           query.value = `'${query.values[0]}'${query.type || ''} and '${query.values[1]}'${query.type || ''}`;
           break;
         case 'in':
-          conector = 'IN';
           query.value = `(${query.values.map(value => `'${value}'`).join(',')})`;
           break;
         case 'like':
         case 'ilike':
-          conector = query.method.toUpperCase();
           query.value = `'${query.value}'${query.type || ''}`;
           break;
         case '>':
         case '<':
-          conector = query.method;
           query.value = `'${query.value}'${query.type || ''}`;
           break;
         default:
-          query.value = `'${query.value}'`;
           conector = '=';
+          query.value = `'${query.value}'`;
       }
     }
     if (typeof query === 'string') {
