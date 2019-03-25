@@ -60,7 +60,8 @@ const parseQuery = where => {
           query.value = `(${query.values.map(value => `'${value}'`).join(',')})`;
           break;
         case 'like':
-          conector = 'LIKE';
+        case 'ilike':
+          conector = query.method.toUpperCase();
           query.value = `'${query.value}'${query.type || ''}`;
           break;
         case '>':
