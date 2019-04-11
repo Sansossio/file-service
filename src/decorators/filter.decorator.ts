@@ -21,8 +21,7 @@ export const Filter = createParamDecorator((data, req) => {
   if (!receiveFilter) {
     receiveFilter = {};
   }
-  const filter = queryPipe(receiveFilter, requiredWhere);
-  return filter;
+  return queryPipe(receiveFilter, requiredWhere);
 });
 
 const queryPipe = (filter: any, requiredWhere) => {
@@ -56,7 +55,8 @@ const parseQuery = where => {
           query.value = `'${query.values[0]}'${query.type || ''} and '${query.values[1]}'${query.type || ''}`;
           break;
         case 'in':
-          query.value = `(${query.values.map(value => `'${value}'`).join(',')})`;
+          const parsedValue = value => `'${value}'`;
+          query.value = `(${query.values.map(parsedValue).join(',')})`;
           break;
         case 'like':
         case 'ilike':

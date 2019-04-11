@@ -57,7 +57,6 @@ export class ConfigService {
     return _.get(this.config, key);
   }
   createTypeOrmOptions(): TypeOrmModuleOptions {
-    const response = this.get<TypeOrmModuleOptions>('database.postgres');
-    return response;
+    return this.get<TypeOrmModuleOptions>('database.postgres');
   }
 }
