@@ -1,9 +1,9 @@
 import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import * as rateLimit from 'express-rate-limit';
-import { INestApplication, INestExpressApplication } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 
-export function setSecurity(app: INestApplication & INestExpressApplication) {
+export function setSecurity(app: INestApplication) {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   app.use(helmet());
