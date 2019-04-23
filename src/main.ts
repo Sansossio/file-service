@@ -16,6 +16,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Template API')
     .setDescription('API definition for a new project')
+    .setSchemes('https', 'http')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
