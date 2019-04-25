@@ -3,6 +3,7 @@ FROM node:11-alpine
 WORKDIR /app
 
 ENV CHROME_BIN=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 RUN apk update && apk upgrade
 RUN apk add --no-cache python make g++
@@ -14,6 +15,7 @@ RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repos
     ttf-freefont \
     chromium@edge \
     harfbuzz@edge \
+    nss@edge \
     font-noto-emoji@edge \
     wqy-zenhei@edge && \
     # /etc/fonts/conf.d/44-wqy-zenhei.conf overrides 'monospace' matching FreeMono.ttf in /etc/fonts/conf.d/69-unifont.conf
