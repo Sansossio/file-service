@@ -14,8 +14,7 @@ async function bootstrap() {
   const port: number = config.get<number>('application.port');
 
   const options = new DocumentBuilder()
-    .setTitle('Template API')
-    .setDescription('API definition for a new project')
+    .setTitle('File Service')
     .setSchemes('https', 'http')
     .setVersion('1.0')
     .addBearerAuth()

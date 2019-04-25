@@ -2,17 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigService } from './config/config.service';
+import { PdfModule } from './pdf/pdf.module';
+import { HandlebarsModule } from './handlebars/handlebars.module';
 
 @Module({
-  imports: [
-    ConfigModule,
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useExisting: ConfigService,
-    }),
-  ],
+  imports: [ConfigModule, PdfModule, HandlebarsModule],
   controllers: [AppController],
   providers: [AppService],
 })
