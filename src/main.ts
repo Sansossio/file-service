@@ -17,7 +17,6 @@ async function bootstrap() {
     .setTitle('File Service')
     .setSchemes('https', 'http')
     .setVersion('1.0')
-    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
