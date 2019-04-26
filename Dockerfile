@@ -1,33 +1,65 @@
-FROM node:11-alpine
+FROM node:8-jessie
 
-WORKDIR /app
+ENV application_directory=/srv/app
 
-ENV CHROME_BIN=/usr/bin/chromium-browser
+RUN apt-get update && apt-get install -y \
+  unzip \
+  fontconfig \
+  locales \
+  gconf-service \
+  libasound2 \
+  libatk1.0-0 \
+  libc6 \
+  libcairo2 \
+  libcups2 \
+  libdbus-1-3 \
+  libexpat1 \
+  libfontconfig1 \
+  libgcc1 \
+  libgconf-2-4 \
+  libgdk-pixbuf2.0-0 \
+  libglib2.0-0 \
+  libgtk-3-0 \
+  libnspr4 \
+  libpango-1.0-0 \
+  libpangocairo-1.0-0 \
+  libstdc++6 \
+  libx11-6 \
+  libx11-xcb1 \
+  libxcb1 \
+  libxcomposite1 \
+  libxcursor1 \
+  libxdamage1 \
+  libxext6 \
+  libxfixes3 \
+  libxi6 \
+  libxrandr2 \
+  libxrender1 \
+  libxss1 \
+  libxtst6 \
+  ca-certificates \
+  fonts-liberation \
+  libappindicator1 \
+  libnss3 \
+  lsb-release \
+  xdg-utils \
+  wget
 
-RUN apk update && apk upgrade
-RUN apk add --no-cache python make g++
-RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories && \
-    apk add --no-cache \
-    ca-certificates \
-    ttf-freefont \
-    chromium@edge \
-    harfbuzz@edge \
-    font-noto-emoji@edge \
-    wqy-zenhei@edge && \
-    # /etc/fonts/conf.d/44-wqy-zenhei.conf overrides 'monospace' matching FreeMono.ttf in /etc/fonts/conf.d/69-unifont.conf
-    mv /etc/fonts/conf.d/44-wqy-zenhei.conf /etc/fonts/conf.d/74-wqy-zenhei.conf && \
-    rm -rf /var/cache/apk/*
+RUN apt-get update && apt-get install -y \
+  libcairo2-dev  \
+  libpoppler-qt5-dev \
+  poppler-data
+
+ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
+RUN chmod +x /usr/local/bin/dumb-init
+
+RUN mkdir $application_directory
+WORKDIR $application_directory
 
 COPY . .
-
-RUN npm install --build-from-source=hummus && \
-    rm -rf node_modules/hummus/src && \
-    rm -rf node_modules/hummus/build
-
+RUN npm install --silent
 RUN npm run build
-
 COPY . .
 
-CMD [ "npm", "run", "start:prod" ]
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "run", "start:prod"]
