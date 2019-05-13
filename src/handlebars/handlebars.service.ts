@@ -12,7 +12,6 @@ export class HandlebarsService {
         html: template(data),
       };
     } catch (e) {
-      delete e.stack;
       throw new HttpException(
         {
           name: 'Error hbs',
