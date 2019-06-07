@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional, ApiResponseModelProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsArray, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsBoolean, IsUrl, IsNotEmpty, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PDFFormat } from 'puppeteer';
 
@@ -49,4 +49,21 @@ export class PdfMergeDto {
 export class PdfBase64ResponseDto {
   @ApiResponseModelProperty()
   pdf: string;
+}
+
+class PdfMergeUrlData {
+  @ApiModelProperty()
+  @IsNotEmpty()
+  @IsUrl()
+  url: string;
+}
+export class PdfMergeUrl {
+  @ApiModelProperty({
+    type: [PdfMergeUrlData],
+  })
+  @IsNotEmpty()
+  @IsArray()
+  @Type(() => PdfMergeUrlData)
+  @ValidateNested({ each: true })
+  pdfs: PdfMergeUrlData[];
 }

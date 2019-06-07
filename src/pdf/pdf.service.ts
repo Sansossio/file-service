@@ -1,14 +1,33 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { compile, TemplateDelegate } from 'handlebars';
+import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+
 import * as chromeModule from 'puppeteer';
 import * as rp from 'request-promise';
 import * as hummus from 'hummus';
 import { WritableStream } from 'memory-streams';
-import { PdfDto, PdfMergeDto } from './dto/pdf.dto';
+import { PdfDto, PdfMergeDto, PdfMergeUrl } from './dto/pdf.dto';
+import { Response } from 'express-serve-static-core';
+import { Readable } from 'stream';
 
 @Injectable()
 export class PdfService {
   private readonly chromeArgs: string[] = ['--no-sandbox', '--disable-setuid-sandbox', '--headless', '--disable-gpu'];
+
+  private async getRemotePdf(uri: string): Promise<Buffer> {
+    const options: rp.OptionsWithUri = {
+      uri,
+      encoding: null,
+    };
+    return (await (rp(options) as any)) as Buffer;
+  }
+
+  responsePdf(res: Response, pdf: Buffer) {
+    const stream = new Readable();
+    stream.push(pdf);
+    stream.push(null);
+    stream.pipe(res);
+    return;
+  }
+
   async merge(data: PdfMergeDto) {
     const { pdf } = data;
     if (!pdf || !pdf.length) {
@@ -33,6 +52,22 @@ export class PdfService {
       outStream.end();
     }
   }
+
+  async mergeRemote(data: PdfMergeUrl) {
+    const { pdfs } = data;
+    if (!pdfs.length) {
+      throw new BadRequestException('Pdfs are required');
+    }
+    const pdfData: string[] = [];
+    for (const pdf of pdfs) {
+      const pdfBuffer: Buffer = await this.getRemotePdf(pdf.url);
+      pdfData.push(pdfBuffer.toString('base64'));
+    }
+    return await this.merge({
+      pdf: pdfData,
+    });
+  }
+
   async generate(data: PdfDto) {
     const browser: chromeModule.Browser = await chromeModule.launch({
       args: this.chromeArgs,
