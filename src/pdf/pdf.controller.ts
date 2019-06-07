@@ -1,7 +1,7 @@
-import { Controller, Post, Body, HttpCode, Header, Res } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Header, Res, Get, Query } from '@nestjs/common';
 import { PdfService } from './pdf.service';
 import { ApiUseTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
-import { PdfDto, PdfMergeDto, PdfBase64ResponseDto, PdfMergeUrl } from './dto/pdf.dto';
+import { PdfDto, PdfMergeDto, PdfBase64ResponseDto, PdfMergeUrl, GetPdf } from './dto/pdf.dto';
 import { Response } from 'express';
 
 const staticHeaders = ['Content-Type', 'application/pdf'];
@@ -97,6 +97,38 @@ export class PdfController {
   @ApiUseTags('Merge Pdf')
   async mergePdfExternalBase64(@Body() body: PdfMergeUrl, @Res() res?: Response) {
     const pdf = await this.mergePdfExternal(body);
+    return {
+      pdf: pdf.toString('base64'),
+    };
+  }
+
+  @Get('remote')
+  @ApiOperation({
+    title: 'Get remote pdf',
+    description: 'See external pdf',
+  })
+  @HttpCode(200)
+  @Header(staticHeaders[0], staticHeaders[1])
+  @ApiUseTags('Get remote Pdf')
+  async get(@Query() { url }: GetPdf, @Res() res?: Response) {
+    const pdfBuffer = await this.pdfService.getRemotePdf(url);
+    if (res) {
+      this.pdfService.responsePdf(res, pdfBuffer);
+      return;
+    }
+    return pdfBuffer;
+  }
+
+  @Get('remote/base64')
+  @ApiOperation({
+    title: 'Get remote pdf',
+    description: 'See external pdf',
+  })
+  @HttpCode(200)
+  @ApiOkResponse({ type: PdfBase64ResponseDto })
+  @ApiUseTags('Get remote Pdf')
+  async getBase64(@Query() query: GetPdf) {
+    const pdf = await this.get(query);
     return {
       pdf: pdf.toString('base64'),
     };

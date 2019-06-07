@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
 
 import * as chromeModule from 'puppeteer';
 import * as rp from 'request-promise';
@@ -12,12 +12,16 @@ import { Readable } from 'stream';
 export class PdfService {
   private readonly chromeArgs: string[] = ['--no-sandbox', '--disable-setuid-sandbox', '--headless', '--disable-gpu'];
 
-  private async getRemotePdf(uri: string): Promise<Buffer> {
-    const options: rp.OptionsWithUri = {
-      uri,
-      encoding: null,
-    };
-    return (await (rp(options) as any)) as Buffer;
+  async getRemotePdf(uri: string): Promise<Buffer> {
+    try {
+      const options: rp.OptionsWithUri = {
+        uri,
+        encoding: null,
+      };
+      return (await (rp(options) as any)) as Buffer;
+    } catch (e) {
+      throw new NotFoundException(`Pdf not found: ${uri}`);
+    }
   }
 
   responsePdf(res: Response, pdf: Buffer) {

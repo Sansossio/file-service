@@ -67,3 +67,10 @@ export class PdfMergeUrl {
   @ValidateNested({ each: true })
   pdfs: PdfMergeUrlData[];
 }
+
+export class GetPdf {
+  @ApiModelProperty()
+  @IsNotEmpty()
+  @IsUrl()
+  url: string;
+}
