@@ -101,36 +101,4 @@ export class PdfController {
       pdf: pdf.toString('base64'),
     };
   }
-
-  @Get('remote')
-  @ApiOperation({
-    title: 'Get remote pdf',
-    description: 'See external pdf',
-  })
-  @HttpCode(200)
-  @Header(staticHeaders[0], staticHeaders[1])
-  @ApiUseTags('Get remote Pdf')
-  async get(@Query() { url }: GetPdf, @Res() res?: Response) {
-    const pdfBuffer = await this.pdfService.getRemotePdf(url);
-    if (res) {
-      this.pdfService.responsePdf(res, pdfBuffer);
-      return;
-    }
-    return pdfBuffer;
-  }
-
-  @Get('remote/base64')
-  @ApiOperation({
-    title: 'Get remote pdf',
-    description: 'See external pdf',
-  })
-  @HttpCode(200)
-  @ApiOkResponse({ type: PdfBase64ResponseDto })
-  @ApiUseTags('Get remote Pdf')
-  async getBase64(@Query() query: GetPdf) {
-    const pdf = await this.get(query);
-    return {
-      pdf: pdf.toString('base64'),
-    };
-  }
 }

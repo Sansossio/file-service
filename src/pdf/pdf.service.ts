@@ -7,22 +7,13 @@ import { WritableStream } from 'memory-streams';
 import { PdfDto, PdfMergeDto, PdfMergeUrl } from './dto/pdf.dto';
 import { Response } from 'express-serve-static-core';
 import { Readable } from 'stream';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class PdfService {
   private readonly chromeArgs: string[] = ['--no-sandbox', '--disable-setuid-sandbox', '--headless', '--disable-gpu'];
 
-  async getRemotePdf(uri: string): Promise<Buffer> {
-    try {
-      const options: rp.OptionsWithUri = {
-        uri,
-        encoding: null,
-      };
-      return (await (rp(options) as any)) as Buffer;
-    } catch (e) {
-      throw new NotFoundException(`Pdf not found: ${uri}`);
-    }
-  }
+  constructor(private readonly fileService: FileService) {}
 
   responsePdf(res: Response, pdf: Buffer) {
     const stream = new Readable();
@@ -64,7 +55,7 @@ export class PdfService {
     }
     const pdfData: string[] = [];
     for (const pdf of pdfs) {
-      const pdfBuffer: Buffer = await this.getRemotePdf(pdf.url);
+      const pdfBuffer: Buffer = await this.fileService.get(pdf.url);
       pdfData.push(pdfBuffer.toString('base64'));
     }
     return await this.merge({
