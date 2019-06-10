@@ -5,9 +5,10 @@ import { ConfigModule } from './config/config.module';
 import { PdfModule } from './pdf/pdf.module';
 import { HandlebarsModule } from './handlebars/handlebars.module';
 import { FileModule } from './file/file.module';
+import { CsvModule } from './csv/csv.module';
 
 @Module({
-  imports: [ConfigModule, PdfModule, HandlebarsModule, FileModule],
+  imports: [ConfigModule, PdfModule, HandlebarsModule, FileModule, CsvModule],
   controllers: [AppController],
   providers: [AppService],
 })
