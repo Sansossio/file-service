@@ -6,7 +6,7 @@ export class FileService {
   async get(uri: string): Promise<Buffer> {
     try {
       const options: rp.OptionsWithUri = {
-        uri,
+        uri: encodeURI(uri),
         encoding: null,
       };
       return (await (rp(options) as any)) as Buffer;
