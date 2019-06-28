@@ -52,11 +52,6 @@ RUN apt-get update && apt-get install -y \
   libpoppler-qt5-dev \
   poppler-data
 
-RUN apt-get install -y python3-pip python3-dev \
-  && cd /usr/local/bin \
-  && ln -s /usr/bin/python3 python \
-&& pip3 install --upgrade pip
-
 ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
 RUN chmod +x /usr/local/bin/dumb-init
 
