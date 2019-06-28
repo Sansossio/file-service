@@ -18,13 +18,6 @@ pipeline {
     }
     // Define stages
     stages {
-      stage("TEST / LINTER") {
-        steps {
-          script {
-            docker.build("${env.BUCODENTAL_REPO}:testing", "-f test.Dockerfile .")
-          }
-        }
-      }
       // Build docker image
       stage("BUILD/PUSH") {
         // Condition
