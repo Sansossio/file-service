@@ -43,7 +43,9 @@ RUN apt-get update && apt-get install -y \
   libnss3 \
   lsb-release \
   xdg-utils \
-  wget
+  wget \
+  libpoppler-qt5-dev \
+  libcairo2-dev
 
 RUN apt-get update && apt-get install -y \
   libcairo2-dev  \

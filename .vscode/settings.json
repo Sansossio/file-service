@@ -9,5 +9,6 @@
   ],
   "line-counter.includes": [
     "**/src/**"
-  ]
+  ],
+  "editor.formatOnSave": true
 }
