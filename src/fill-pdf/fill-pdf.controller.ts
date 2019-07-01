@@ -29,6 +29,7 @@ export class FillPdfController {
   @Post('fill')
   @ApiOperation({
     title: 'Fill pdf',
+    description: 'Return pdf as file',
   })
   @HttpCode(200)
   @Header('Content-Type', 'application/pdf')
