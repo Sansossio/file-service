@@ -4,6 +4,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiImplicitFile, ApiOkResponse, ApiOperation, ApiUseTags } from '@nestjs/swagger';
 import { FillPdfResponseDto, FillPdfRequestDto } from './fill-pdf.dto';
 import { PdfService } from '../pdf/pdf.service';
+import { Response } from 'express';
 
 @Controller('pdf')
 @ApiUseTags('Fill pdf')
@@ -32,9 +33,9 @@ export class FillPdfController {
     description: 'Return pdf as file',
   })
   @HttpCode(200)
-  @Header('Content-Type', 'application/pdf')
-  async fill(@Body() data: FillPdfRequestDto, @Res() response) {
+  async fill(@Body() data: FillPdfRequestDto, @Res() response: Response) {
     const buffer = await this.service.writePdf(data);
+    response.setHeader('Content-Type', 'application/pdf');
     return this.pdfSrrvice.responsePdf(response, buffer);
   }
 }

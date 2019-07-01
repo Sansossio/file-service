@@ -1,11 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { unlink, writeFile } from 'fs';
-import { join } from 'path';
 import * as fillService from 'pdf-fill-form';
 import * as sha1 from 'sha1';
 import { promisify } from 'util';
+
 import { FillPdfRequestDto } from './fill-pdf.dto';
-import { PdfService } from '../pdf/pdf.service';
 
 interface IFile {
   buffer: Buffer;
@@ -37,12 +36,25 @@ export class FillPdfService {
 
   async writePdf(body: FillPdfRequestDto) {
     const pdf = Buffer.from(body.file, 'base64');
-    const fileName = `${sha1(body.file)}.pdf`;
-    await promisify(writeFile)(fileName, pdf);
     const data = body.data.reduce((prev, curr) => {
       prev[curr.key] = curr.value;
       return prev;
     }, {});
+    // Comprobe keys
+    const baseKeys = await this.getKeys({
+      buffer: pdf,
+      mimetype: 'application/pdf',
+    });
+    for (const { name, type } of baseKeys) {
+      const currValue = data[name];
+      if (currValue === undefined) continue;
+      if (type === 'checkbox' && typeof currValue !== 'boolean') {
+        throw new BadRequestException('Checkout type need a boolean value');
+      }
+    }
+    // Fill Pdf
+    const fileName = `${sha1(body.file)}.pdf`;
+    await promisify(writeFile)(fileName, pdf);
     try {
       return (await fillService.write(fileName, data, { save: 'pdf' })) as Buffer;
     } finally {
