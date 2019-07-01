@@ -49,7 +49,7 @@ export class FillPdfService {
       const currValue = data[name] || data[id];
       if (currValue === undefined) continue;
       if (type === 'checkbox' && typeof currValue !== 'boolean') {
-        throw new BadRequestException('Checkout type need a boolean value');
+        throw new BadRequestException(`Checkout type need a boolean value (key: ${id || name}, value: ${currValue})`);
       }
     }
     // Fill Pdf
