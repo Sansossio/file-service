@@ -40,7 +40,7 @@ export class FillPdfService {
       prev[curr.key] = curr.value;
       return prev;
     }, {});
-    // Comprobe keys
+    // Check keys
     const baseKeys = await this.getKeys({
       buffer: pdf,
       mimetype: 'application/pdf',
