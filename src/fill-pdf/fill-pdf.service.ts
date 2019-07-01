@@ -45,8 +45,8 @@ export class FillPdfService {
       buffer: pdf,
       mimetype: 'application/pdf',
     });
-    for (const { name, type } of baseKeys) {
-      const currValue = data[name];
+    for (const { id, name, type } of baseKeys) {
+      const currValue = data[name] || data[id];
       if (currValue === undefined) continue;
       if (type === 'checkbox' && typeof currValue !== 'boolean') {
         throw new BadRequestException('Checkout type need a boolean value');
