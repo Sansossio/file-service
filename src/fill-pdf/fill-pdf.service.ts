@@ -37,6 +37,9 @@ export class FillPdfService {
   async writePdf(body: FillPdfRequestDto) {
     const pdf = Buffer.from(body.file, 'base64');
     const data = body.data.reduce((prev, curr) => {
+      if (typeof curr.value === 'string' && body.upperCase) {
+        curr.value = curr.value.toUpperCase();
+      }
       prev[curr.key] = curr.value;
       return prev;
     }, {});

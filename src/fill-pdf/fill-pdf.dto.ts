@@ -1,5 +1,5 @@
 import { ApiResponseModelProperty, ApiModelProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsBase64, IsArray, IsString, ValidateNested } from 'class-validator';
+import { IsNotEmpty, IsBase64, IsArray, IsString, ValidateNested, IsOptional, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class FillPdfResponseDto {
@@ -46,4 +46,9 @@ export class FillPdfRequestDto {
   @Type(() => FillPdfRequestDtoData)
   @ValidateNested({ each: true })
   data: FillPdfRequestDtoData[];
+
+  @ApiResponseModelProperty()
+  @IsOptional()
+  @IsBoolean()
+  upperCase?: boolean = false;
 }
