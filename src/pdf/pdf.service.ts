@@ -72,7 +72,7 @@ export class PdfService {
     const page: chromeModule.Page = await browser.newPage();
     await page.setContent(data.html, { waitUntil: 'networkidle2' });
     const bufferPdf: Buffer = await page.pdf({
-      format: data.pageFormat || 'A4',
+      format: data.pageFormat,
       printBackground: data.printBackground,
       landscape: data.landscape,
       headerTemplate: data.header,
