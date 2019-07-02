@@ -73,6 +73,7 @@ export class PdfService {
     await page.setContent(data.html, { waitUntil: 'networkidle2' });
     const bufferPdf: Buffer = await page.pdf({
       format: data.pageFormat,
+      preferCSSPageSize: !data.pageFormat,
       printBackground: data.printBackground,
       landscape: data.landscape,
       headerTemplate: data.header,
