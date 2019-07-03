@@ -71,13 +71,18 @@ export class PdfService {
     });
     const page: chromeModule.Page = await browser.newPage();
     await page.setContent(data.html, { waitUntil: 'networkidle2' });
+    const displayHeaderFooter = !!data.footer || !!data.header;
+    if (displayHeaderFooter) {
+      data.header = data.header || ' ';
+      data.footer = data.footer || ' ';
+    }
     const bufferPdf: Buffer = await page.pdf({
       format: data.pageFormat,
       preferCSSPageSize: !data.pageFormat,
       printBackground: data.printBackground,
       landscape: data.landscape,
+      displayHeaderFooter,
       headerTemplate: data.header,
-      displayHeaderFooter: !!data.footer || !!data.header,
       footerTemplate: data.footer,
     });
     await page.close();
