@@ -1,7 +1,7 @@
 {
-  "name": "nest-template",
+  "name": "file-service",
   "version": "0.0.0",
-  "description": "Nest template for Aluxion labs",
+  "description": "File service project",
   "author": "",
   "license": "MIT",
   "scripts": {
